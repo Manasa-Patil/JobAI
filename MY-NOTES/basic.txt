@@ -1,0 +1,170 @@
+1.dependencies vs dev-dependencies
+ans:- Dependencies are packages required for the application to run in production, such as Express, Mongoose, and JWT. Dev dependencies are packages used only during development, testing, or build processes, such as Nodemon, ESLint, and Prettier. Dependencies are installed with npm install, while dev dependencies are installed using npm install -D.
+
+2. whats npm iniy -y
+ans:- npm init -y is a command used to quickly initialize a new Node.js project. It automatically creates a package.json file with default values without prompting the user for input.
+
+Normally, npm init asks several questions such as project name, version, description, and entry point. Adding the -y flag accepts all default values and generates the package.json instantly.
+
+3.whats package.json?
+ans:-package.json is the main configuration file of a Node.js project. It contains metadata about the project and manages dependencies, scripts, version information, and other project settings and tells npm how the project is configured and which packages are required.
+
+4.Why do we use app.use(express.json())?
+
+ans:-express.json() is a built-in middleware in Express that parses incoming JSON data from the request body and makes it available in req.body.
+
+Without this middleware, Express cannot automatically read JSON data sent by the client and Express doesn't know how to parse the JSON.
+
+5: Why do we use a .env file?
+
+ans:-.env file is used to store environment variables such as API keys, database URLs, JWT secrets, and other sensitive configuration values outside the source code.
+
+This improves security, maintainability, and flexibility.
+-THIS BASICALLY MAKES THIS VARIABLES USE ANYWHERE IN THAT FOLDER/APPLICATION
+
+6. Command to create server:-
+to create server- npm i express 
+
+7. why is config methos called here-require("dotenv").config() ??
+-through this we can access the variables inside .env file anywhere in this server
+
+8.cluster:- its in mongo ATLAS , consist of multiple databases, and we can set certain configurations, provisioned with certain CPU,memory on any cloud provider like AWS etc
+
+9.ip address 0.0.0.0- used during development mainly to allow your application to connect to the database from any IP address.even if ur laptops public IP changes frequently
+
+10.Write code to connect ur server to database
+
+- const mongoose=require("mongoose")
+async function connectToDB(){
+    try{
+        await mongoose.connect(process.env.MONGO_URI)
+        console.log("connected to Database")
+    }
+    catch(err){
+        console.log(err)
+    }
+}
+
+module.exports=connectToDB
+
+and LATER in server.js import this connectToDB function and call it - connectToDB()
+
+11. should the password be unique for each user while accessing ur application ??? also justify ur answer
+-"No, passwords don't need to be unique across users. The user's email or username uniquely identifies the account, and the password is used to authenticate that particular account. Two users can technically have the same password, although each password should still be strong and securely hashed."
+s0 because it doesn't provide meaningful security and would unnecessarily restrict users.
+
+
+12. bcryptjs- used for hashing password
+    jsonwebtoken- used to create jwt tokens
+    cookie-parser- used to set the token inside the cookie or read the token from the cookie
+
+14. status code:- 201- when new resource is created in backend
+                  200 OK – Request successful 
+                  400 Bad Request – Invalid syntax 
+                  401 Unauthorized – Authentication required 
+                  404 Not Found – Resource not available 
+
+
+ 15.explain consequences of traditional logout, why token blacklisting is used and how its implemented??
+ --"When the user logs out, removing the JWT from the browser cookie only removes it from that user's browser. It doesn't invalidate the JWT itself. If a hacker had already stolen or copied that token, they could continue using it until it expires. So, for immediate logout, we can blacklist the token ID in Redis. On every request, we verify the JWT and also check whether its ID is blacklisted. If it is, we reject the request."          
+ 
+ token blacklisting in production is usually done through redis for faster response and higher throughput, but not for development sake i did through mongoDB only            
+
+ 16.How to make the items center through css?
+
+ - main{
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} 
+
+17. How to prevent reloading when submitting any form?
+- use this function
+const handleSubmit=(e)=>{
+    e.preventDefault()
+}
+
+- and in form use this function
+<form onSubmit={handleSubmit}>
+<form/>
+
+OR WE CAN ALSO US USEMEMO HOOK of react
+ 
+------------------------------------------------------------------------------------
+Note:-
+4 layers in frontend react architecture and folders present for them  
+
+a) UI 
+=>component folder
+=>pages folder
+
+usage:- visible part for the user(like in this we write codes of  forms,buttons,input fields,headers, paragraphs) and help for navigation(like using LINK, useNavigate) within the pages
+
+b) HOOK
+=>hooks folder
+
+usage:- for managing state and api layers, it manages the flow, combines context, api layers
+
+c) STATE
+=>auth.context.jsx file
+=>ai.context.jsx file
+
+usage:- helps in state management
+        stores logged-in user data in the frontend
+        also handles loading state -- time till backend is sending response
+
+d) API
+=> services folder
+   =>auth.api.js file
+   =>ai.api.js file
+
+usage:- enables ur frontend to connect to the Backend/ for communication with backend 
+
+---------------------------------------------------------------------------------------   
+
+18. Which package do u use to connect frontend with backend?
+- Axios 
+
+19.What is CORS?
+“CORS stands for Cross-Origin Resource Sharing. It is a browser security mechanism that controls whether a frontend from one origin can access a backend on another origin. For example, if React runs on port 5173 and Node.js runs on port 5000, they are different origins, so the backend needs to allow the frontend using CORS. In Express, we can configure it using the cors middleware.”
+“For example, I can use app.use(cors({ origin: "http://localhost:5173" })) to allow requests from my React frontend.”
+
+20. How would you fix a CORS issue in your Node.js backend?
+First, I would check the frontend origin and the backend origin. If they are different, I would configure CORS in Express using the cors middleware and allow the required frontend origin. I would also check whether credentials, HTTP methods, and headers need to be explicitly allowed.
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}));
+
+21. Why do we get a CORS error when using React and Node.js?
+Because the frontend and backend may be running on different origins. For example, React might run on localhost:5173 while the Node.js backend runs on localhost:5000. The browser considers them different origins and blocks the request unless the backend allows that frontend origin through CORS headers.
+
+22. My React application is running on port 5173 and my Express server is running on port 5000. My API works in Postman but fails in the browser with a CORS error. Why?
+Postman doesn't enforce browser CORS restrictions, but the browser does. So the API itself may be working correctly. I need to configure CORS on the Express backend to allow requests from my React application's origin.
+
+const cors = require("cors");
+app.use(cors({
+    origin: "http://localhost:5173"
+}));
+
+23. Why does Postman work but the browser doesn't?
+CORS is primarily a browser-enforced security mechanism. Postman is not a browser, so it doesn't enforce the same CORS restrictions. Therefore, the API can work in Postman while the browser blocks the frontend request.
+
+24. what is useEffect hook?
+-useEffect is a React Hook used to perform side effects in functional components, such as API calls, subscriptions, timers, or interacting with external systems, based on the component lifecycle and dependencies.
+-it Runs once when component loads
+
+ex:- useEffect for fetching the logged-in user when the component loads. 
+
+25. Which gemini model did u use?
+-gemini-3.6-flash :- budget friendly which medium level performance, used for regular tasks
+
+26. what is ZOD?
+-Zod is mainly used for validation. Think of it as a way to make sure the data coming into your backend(from frontend, ai model) is in the correct format before you use it.
+
+27.to handle pdf from frontend-multer
+   to read the content inside the PDF- use pdf-parse package
+
+28.    
