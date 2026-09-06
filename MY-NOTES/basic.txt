@@ -167,4 +167,4 @@ ex:- useEffect for fetching the logged-in user when the component loads.
 27.to handle pdf from frontend-multer
    to read the content inside the PDF- use pdf-parse package
 
-28.    
+28. puppeteer package convert HTML to PDF   
